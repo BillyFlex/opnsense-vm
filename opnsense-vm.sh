@@ -282,7 +282,7 @@ function default_settings() {
   CPU_TYPE=""
   CORE_COUNT="4"
   RAM_SIZE="8192"
-  BRG="vmbr0"
+  BRG="vmbr1"
   IP_ADDR=""
   WAN_IP_ADDR=""
   LAN_GW=""
@@ -757,16 +757,19 @@ while :; do
     alloc_delay=$((alloc_delay * 2))
     continue
   fi
-  echo -e "$alloc_err test" >&2
+  echo -e "${alloc_err} test" >&2
   exit 220
 done
+echo "import disk"
 qm importdisk $VMID ${FILE} $STORAGE ${DISK_IMPORT:-} &>/dev/null
+echo "qemu set"
 qm set $VMID \
   -efidisk0 ${DISK0_REF}${FORMAT} \
   -scsi0 ${DISK1_REF},${DISK_CACHE}${THIN}size=2G \
   -boot order=scsi0 \
   -serial0 socket \
   -tags community-script >/dev/null
+echo "qemu resize"
 qm resize $VMID scsi0 20G >/dev/null
 DESCRIPTION=$(
   cat <<EOF
@@ -811,6 +814,9 @@ qm start $VMID
 sleep 200
 send_line_to_vm "root"
 sleep 2
+send_line_to_vm "ifconfig vtnet1 10.59.0.3/29"
+send_line_to_vm "route add default 10.59.0.1"
+send_line_to_vm "echo -e 'nameserver 1.1.1.1\nnameserver 8.8.8.8' > /etc/resolv.conf"
 send_line_to_vm ""
 send_line_to_vm "fetch https://raw.githubusercontent.com/opnsense/update/master/src/bootstrap/opnsense-bootstrap.sh.in"
 if [ -n "$WAN_BRG" ]; then
