@@ -770,7 +770,7 @@ qm set $VMID \
   -serial0 socket \
   -tags community-script >/dev/null
 echo "qemu resize"
-qm resize $VMID scsi0 20G >/dev/null
+qm disk resize $VMID scsi0 20G >/dev/null
 DESCRIPTION=$(
   cat <<EOF
 <div align='center'>
@@ -811,7 +811,7 @@ msg_ok "Bridge interfaces have been successfully added."
 msg_ok "Created a OPNsense VM ${CL}${BL}(${HN})"
 msg_ok "Starting OPNsense VM (Patience this takes 20-30 minutes)"
 qm start $VMID
-sleep 180
+sleep 200
 send_line_to_vm "root"
 sleep 2
 send_line_to_vm "ifconfig vtnet0 10.59.0.3/29"
