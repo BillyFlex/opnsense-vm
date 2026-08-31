@@ -757,7 +757,7 @@ while :; do
     alloc_delay=$((alloc_delay * 2))
     continue
   fi
-  echo -e "$alloc_err" >&2
+  echo -e "$alloc_err test" >&2
   exit 220
 done
 qm importdisk $VMID ${FILE} $STORAGE ${DISK_IMPORT:-} &>/dev/null
@@ -808,7 +808,7 @@ msg_ok "Bridge interfaces have been successfully added."
 msg_ok "Created a OPNsense VM ${CL}${BL}(${HN})"
 msg_ok "Starting OPNsense VM (Patience this takes 20-30 minutes)"
 qm start $VMID
-sleep 90
+sleep 200
 send_line_to_vm "root"
 sleep 2
 send_line_to_vm ""
