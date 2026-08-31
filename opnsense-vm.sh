@@ -811,10 +811,10 @@ msg_ok "Bridge interfaces have been successfully added."
 msg_ok "Created a OPNsense VM ${CL}${BL}(${HN})"
 msg_ok "Starting OPNsense VM (Patience this takes 20-30 minutes)"
 qm start $VMID
-sleep 200
+sleep 120
 send_line_to_vm "root"
 sleep 2
-send_line_to_vm "ifconfig vtnet1 10.59.0.3/29"
+send_line_to_vm "ifconfig vtnet0 10.59.0.3/29"
 send_line_to_vm "route add default 10.59.0.1"
 send_line_to_vm "echo -e 'nameserver 1.1.1.1\nnameserver 8.8.8.8' > /etc/resolv.conf"
 send_line_to_vm ""
