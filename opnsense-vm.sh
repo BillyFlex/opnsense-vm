@@ -767,7 +767,7 @@ qm set $VMID \
   -boot order=scsi0 \
   -serial0 socket \
   -tags community-script >/dev/null
-sleep 15
+sleep 60
 echo "qemu resize ${VMID}"
 qm disk resize $VMID scsi0 20G >/dev/null
 DESCRIPTION=$(
@@ -891,6 +891,14 @@ done
 msg_ok "OPNsense build finished after $((build_elapsed / 60)) minutes"
 send_line_to_vm "root"
 send_line_to_vm "opnsense"
+send_line_to_vm "1"
+send_line_to_vm "n"
+send_line_to_vm "n"
+send_line_to_vm "vtnet0"
+send_line_to_vm "vtnet1"
+send_line_to_vm " "
+send_line_to_vm "y"
+sleep 20
 send_line_to_vm "2"
 
 if [ "$IP_ADDR" != "" ]; then
