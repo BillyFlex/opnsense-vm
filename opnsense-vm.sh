@@ -767,6 +767,7 @@ qm set $VMID \
   -boot order=scsi0 \
   -serial0 socket \
   -tags community-script >/dev/null
+sleep 15
 echo "qemu resize ${VMID}"
 qm disk resize $VMID scsi0 20G >/dev/null
 DESCRIPTION=$(
