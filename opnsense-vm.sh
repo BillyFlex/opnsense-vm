@@ -282,7 +282,7 @@ function default_settings() {
   CPU_TYPE=""
   CORE_COUNT="4"
   RAM_SIZE="8192"
-  BRG="vmbr1"
+  BRG=""
   IP_ADDR=""
   WAN_IP_ADDR=""
   LAN_GW=""
@@ -292,7 +292,7 @@ function default_settings() {
   VLAN=""
   MAC=$GEN_MAC
   WAN_MAC=$GEN_MAC_LAN
-  WAN_BRG=""
+  WAN_BRG="vmbr1"
   MTU=""
   START_VM="yes"
   METHOD="default"
