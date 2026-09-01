@@ -858,8 +858,8 @@ hash_b=""
 sleep 300
 while [ $build_stable -lt 6 ] && [ $build_elapsed -lt 2400 ]; do
   sleep 30
-  build_elapsed=$((build_elapsed + 10))
-  real_time = $(build_elapsed * 3)
+  build_elapsed=$((build_elapsed + 5))
+  real_time = $(build_elapsed * 6)
   new_hash=$(screen_hash)
   if [ -n "$new_hash" ]; then
     screen_ok=1
