@@ -741,7 +741,7 @@ done
 
 msg_info "Creating a OPNsense VM"
 qm create $VMID -agent 1${MACHINE} -tablet 0 -localtime 1 -bios ovmf${CPU_TYPE} -cores $CORE_COUNT -memory $RAM_SIZE \
-  -name $HN -tags community-script -net0 virtio,bridge=$BRG,macaddr=$MAC$VLAN$MTU -onboot 1 -ostype l26 -scsihw virtio-scsi-pci
+  -name $HN -tags community-script -net0 virtio,bridge=$WAN_BRG,macaddr=$WAN_MAC -onboot 1 -ostype l26 -scsihw virtio-scsi-pci
 
 # Retry pvesm alloc on transient zfs_request "got timeout" errors (#14127)
 alloc_attempt=1
@@ -760,16 +760,14 @@ while :; do
   echo -e "${alloc_err} test" >&2
   exit 220
 done
-echo "import disk"
 qm importdisk $VMID ${FILE} $STORAGE ${DISK_IMPORT:-} &>/dev/null
-echo "qemu set"
 qm set $VMID \
   -efidisk0 ${DISK0_REF}${FORMAT} \
   -scsi0 ${DISK1_REF},${DISK_CACHE}${THIN}size=2G \
   -boot order=scsi0 \
   -serial0 socket \
   -tags community-script >/dev/null
-echo "qemu resize"
+echo "qemu resize ${VMID}"
 qm disk resize $VMID scsi0 20G >/dev/null
 DESCRIPTION=$(
   cat <<EOF
@@ -805,25 +803,25 @@ qm set $VMID -description "$DESCRIPTION" >/dev/null
 
 msg_info "Bridge interfaces are being added."
 qm set $VMID \
-  -net0 virtio,bridge=${BRG},macaddr=${MAC}${VLAN}${MTU} 2>/dev/null
+  -net0 virtio,bridge=${WAN_BRG},macaddr=${WAN_MAC} 2>/dev/null
 msg_ok "Bridge interfaces have been successfully added."
 
 msg_ok "Created a OPNsense VM ${CL}${BL}(${HN})"
 msg_ok "Starting OPNsense VM (Patience this takes 20-30 minutes)"
 qm start $VMID
-sleep 200
+sleep 150
 send_line_to_vm "root"
 sleep 2
-send_line_to_vm "ifconfig vtnet0 10.59.0.3/29"
-send_line_to_vm "route add default 10.59.0.1"
+send_line_to_vm "ifconfig vtnet0 ${WAN_IP_ADDR}/${WAN_NETMASK}"
+send_line_to_vm "route add default ${WAN_GW}"
 send_line_to_vm "echo -e 'nameserver 1.1.1.1\nnameserver 8.8.8.8' > /etc/resolv.conf"
 send_line_to_vm ""
 send_line_to_vm "fetch https://raw.githubusercontent.com/opnsense/update/master/src/bootstrap/opnsense-bootstrap.sh.in"
-if [ -n "$WAN_BRG" ]; then
-  msg_info "Adding WAN interface"
+if [ -n "$BRG" ]; then
+  msg_info "Adding LAN interface"
   qm set $VMID \
-    -net1 virtio,bridge=${WAN_BRG},macaddr=${WAN_MAC} &>/dev/null
-  msg_ok "WAN interface added"
+    -net1 virtio,bridge=${BRG},macaddr=${MAC}${VLAN}${MTU} &>/dev/null
+  msg_ok "LAN interface added"
   sleep 5 # Brief pause after adding network interface
 fi
 # FreeBSD 15+ VM images ship the base system as pkgbase packages; the bootstrap\'s
