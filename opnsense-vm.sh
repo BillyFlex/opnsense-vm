@@ -859,7 +859,7 @@ sleep 300
 while [ $build_stable -lt 6 ] && [ $build_elapsed -lt 2400 ]; do
   sleep 30
   build_elapsed=$((build_elapsed + 10))
-  echo "${build_elapsed}"
+  real_time = $(build_elapsed * 3)
   new_hash=$(screen_hash)
   if [ -n "$new_hash" ]; then
     screen_ok=1
@@ -876,15 +876,15 @@ while [ $build_stable -lt 6 ] && [ $build_elapsed -lt 2400 ]; do
   hash_b="$hash_a"
   hash_a="$new_hash"
   if [ -n "$new_hash" ]; then
-    echo -e "${DGN}Waiting for OPNsense build: ${YW}$((build_elapsed / 60))min elapsed, screen ${new_hash:0:8}, stable ${build_stable}/6${CL}"
+    echo -e "${DGN}Waiting for OPNsense build: ${YW}$((real_time / 60))min elapsed, screen ${new_hash:0:8}, stable ${build_stable}/6${CL}"
   else
-    echo -e "${DGN}Waiting for OPNsense build: ${YW}$((build_elapsed / 60))min elapsed, screendump failed${CL}"
+    echo -e "${DGN}Waiting for OPNsense build: ${YW}$((real_time / 60))min elapsed, screendump failed${CL}"
   fi
   # No working screendump after several attempts: fixed wait instead
   if [ $screen_ok -eq 0 ] && [ $build_elapsed -ge 480 ]; then
     msg_error "Console screendump not available on this system - falling back to a fixed wait (12 minutes)."
     sleep 720
-    build_elapsed=$((build_elapsed + 720))
+    build_elapsed=$((real_time + 720))
     break
   fi
 done
