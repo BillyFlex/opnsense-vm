@@ -853,13 +853,14 @@ function screen_hash() {
 build_elapsed=300
 build_stable=0
 screen_ok=0
+real_time=0
 hash_a=""
 hash_b=""
 sleep 300
 while [ $build_stable -lt 6 ] && [ $build_elapsed -lt 2400 ]; do
   sleep 30
   build_elapsed=$((build_elapsed + 5))
-  real_time = $(build_elapsed * 6)
+  real_time=$((build_elapsed * 6))
   new_hash=$(screen_hash)
   if [ -n "$new_hash" ]; then
     screen_ok=1
@@ -884,11 +885,11 @@ while [ $build_stable -lt 6 ] && [ $build_elapsed -lt 2400 ]; do
   if [ $screen_ok -eq 0 ] && [ $build_elapsed -ge 480 ]; then
     msg_error "Console screendump not available on this system - falling back to a fixed wait (12 minutes)."
     sleep 720
-    build_elapsed=$((real_time + 720))
+    real_time=$((real_time + 720))
     break
   fi
 done
-msg_ok "OPNsense build finished after $((build_elapsed / 60)) minutes"
+msg_ok "OPNsense build finished after $((ream_time / 60)) minutes"
 send_line_to_vm "root"
 send_line_to_vm "opnsense"
 send_line_to_vm "1"
