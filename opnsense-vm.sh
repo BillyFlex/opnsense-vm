@@ -889,7 +889,7 @@ while [ $build_stable -lt 6 ] && [ $build_elapsed -lt 2400 ]; do
     break
   fi
 done
-msg_ok "OPNsense build finished after $((ream_time / 60)) minutes"
+msg_ok "OPNsense build finished after $((real_time / 60)) minutes"
 send_line_to_vm "root"
 send_line_to_vm "opnsense"
 send_line_to_vm "1"
